@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Agri Scan
 
-## Getting Started
+Agri Scan is an AI-powered crop disease detection web app with:
 
-First, run the development server:
+- Next.js frontend (camera-first user flow)
+- FastAPI backend for inference
+- Structured dataset workflow for PlantVillage/Kaggle data
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Monorepo Structure
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `app`, `components`, `lib`: Next.js frontend
+- `backend/app`: FastAPI API service
+- `backend/scripts`: data and utility scripts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Frontend Setup
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. Install dependencies:
+   - `npm install`
+2. Configure frontend env:
+   - `copy .env.example .env.local`
+3. Run frontend:
+   - `npm run dev`
+4. Open:
+   - `http://localhost:3000`
 
-## Learn More
+## Backend Setup
 
-To learn more about Next.js, take a look at the following resources:
+1. Move into backend:
+   - `cd backend`
+2. Create venv and activate it.
+3. Install dependencies:
+   - `pip install -r requirements.txt`
+4. Configure backend env:
+   - `copy .env.example .env`
+5. Run backend:
+   - `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Dataset Download
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Inside `backend`:
 
-## Deploy on Vercel
+- `python scripts/download_dataset.py`
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This downloads:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `emmarex/plantdisease`
+
+## API Contract
+
+- `POST /predict`
+  - `multipart/form-data`
+  - field name: `file`
+  - accepts `image/jpeg` and `image/png`
+  - response:
+    - `disease` (string)
+    - `confidence` (0.0 to 1.0)
+    - `class_id` (int)
+
+## Safety
+
+The frontend includes explicit safety disclaimers:
+
+- AI output is assistive guidance only
+- users should verify before pesticide application
+- low-confidence outputs should be re-scanned and reviewed by an expert
