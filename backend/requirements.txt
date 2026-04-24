@@ -1,0 +1,12 @@
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+python-multipart>=0.0.6
+# Upper bounds prevent pip from upgrading torch to a huge new wheel (e.g. 2.11)
+# when torchvision was missing — that upgrade often fails on low disk space.
+torch>=2.1.0,<2.9
+torchvision>=0.16.0,<0.24
+pillow>=10.0.0
+numpy>=1.24.0
+transformers>=4.40.0
+safetensors>=0.4.0
+huggingface_hub>=0.23.0

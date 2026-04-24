@@ -1,18 +1,23 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { CameraScanner } from "@/components/CameraScanner";
 import { SafetyDisclaimer } from "@/components/SafetyDisclaimer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { type CropType, predict } from "@/lib/api";
+import { type CropType, getModelInfo, predict, type ModelInfoResponse } from "@/lib/api";
 import { normalizeDiseaseName } from "@/lib/treatments";
 
 export default function ScanPage() {
   const router = useRouter();
   const [selectedCrop, setSelectedCrop] = useState<CropType>("tomato");
   const [language, setLanguage] = useState<"en" | "ur">("en");
+  const [modelInfo, setModelInfo] = useState<ModelInfoResponse | null>(null);
+
+  useEffect(() => {
+    getModelInfo().then(setModelInfo).catch(() => setModelInfo(null));
+  }, []);
 
   const copy = useMemo(
     () =>
@@ -30,6 +35,8 @@ export default function ScanPage() {
             scanNow: "Scan Now",
             scanning: "Scanning...",
             uploadFallback: "Upload an image instead",
+            placeholderModel:
+              "The API is using temporary weights so scans work end-to-end. Train on your real leaf dataset (see project README), save artifacts/best.pt, then restart the backend for real disease detection.",
           }
         : {
             title: "پتے کو اسکین کریں",
@@ -43,6 +50,8 @@ export default function ScanPage() {
             scanNow: "اسکین کریں",
             scanning: "اسکین ہو رہا ہے...",
             uploadFallback: "متبادل طور پر تصویر اپ لوڈ کریں",
+            placeholderModel:
+              "سرور عارضی وزن استعمال کر رہا ہے۔ اصل پتے کی تصاویر پر تربیت کریں، artifacts/best.pt محفوظ کریں، اور پھر بیک اینڈ دوبارہ چلائیں۔",
           },
     [language],
   );
@@ -75,6 +84,11 @@ export default function ScanPage() {
         <div className="mt-3">
           <SafetyDisclaimer compact />
         </div>
+        {modelInfo?.model_loaded && modelInfo.diagnostic_ready === false && (
+          <p className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+            {copy.placeholderModel}
+          </p>
+        )}
       </section>
 
       <Card className="glass-card rounded-2xl">

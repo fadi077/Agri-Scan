@@ -174,6 +174,25 @@ export default function ResultPage() {
         previewSrc={preview}
         uncertain={Boolean(result.uncertain)}
       />
+      {result.storage && (
+        <p className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-xs leading-relaxed text-gray-700">
+          This scan was saved on the API machine under{" "}
+          <code className="break-all rounded bg-gray-100 px-1 py-0.5 text-[11px]">
+            {result.storage.saved_file}
+          </code>
+          {result.storage.matching_training_folder ? (
+            <>
+              {" "}
+              The predicted label matches a subfolder in your training dataset:{" "}
+              <span className="font-medium">{result.storage.matching_training_folder}</span>.
+            </>
+          ) : result.storage.training_dataset_configured ? (
+            <> No folder with the exact predicted class name was found under your configured training dataset.</>
+          ) : (
+            <> Set <code className="text-[11px]">TRAINING_DATASET_DIR</code> in the backend env to link scans to your ImageFolder layout.</>
+          )}
+        </p>
+      )}
       {result.rejected ? (
         <InvalidScanNotice
           reason={result.rejection_reason}

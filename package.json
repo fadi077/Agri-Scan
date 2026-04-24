@@ -4,6 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:api": "node scripts/free-port.js 8000 && cd backend && python -m uvicorn app.main:app --host 127.0.0.1 --port 8000",
+    "dev:api:reload": "cd backend && python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000",
+    "dev:all": "concurrently -k -n next,api -c cyan,magenta \"next dev\" \"npm run dev:api\"",
+    "dev:clean": "node -e \"try{require('fs').rmSync('.next',{recursive:true,force:true})}catch(e){if(e.code!=='ENOENT')throw e}\"",
+    "dev:fresh": "npm run dev:clean && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
@@ -28,6 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^9.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
     "tailwindcss": "^4",

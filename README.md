@@ -1,65 +1,45 @@
 # Agri Scan
 
-Agri Scan is an AI-powered crop disease detection web app with:
+Agri Scan is a crop leaf disease detector with a Next.js frontend and a FastAPI backend.
 
-- Next.js frontend (camera-first user flow)
-- FastAPI backend for inference
-- Structured dataset workflow for PlantVillage/Kaggle data
+## Quick Start
 
-## Monorepo Structure
-
-- `app`, `components`, `lib`: Next.js frontend
-- `backend/app`: FastAPI API service
-- `backend/scripts`: data and utility scripts
-
-## Frontend Setup
-
-1. Install dependencies:
+1. Install frontend dependencies (repo root):
    - `npm install`
-2. Configure frontend env:
-   - `copy .env.example .env.local`
-3. Run frontend:
-   - `npm run dev`
-4. Open:
+2. Install backend dependencies:
+   - `cd backend`
+   - `pip install -r requirements.txt`
+3. Copy frontend env:
+   - `copy ..\\.env.example ..\\.env.local`
+4. Run both apps from repo root:
+   - `cd ..`
+   - `npm run dev:all`
+5. Open:
    - `http://localhost:3000`
 
-## Backend Setup
+## Kaggle Model Workflow (Required)
 
-1. Move into backend:
-   - `cd backend`
-2. Create venv and activate it.
-3. Install dependencies:
-   - `pip install -r requirements.txt`
-4. Configure backend env:
-   - `copy .env.example .env`
-5. Run backend:
-   - `uvicorn app.main:app --reload --host 0.0.0.0 --port 8000`
+This project now uses **local trained weights only** for predictions.
 
-## Dataset Download
+From `backend`, train on your Kaggle ImageFolder dataset:
 
-Inside `backend`:
+- `python scripts/train.py --data-dir "<KAGGLE_IMAGEFOLDER_ROOT>" --out-dir ..\\artifacts`
 
-- `python scripts/download_dataset.py`
+That creates:
 
-This downloads:
+- `artifacts/best.pt`
+- `artifacts/class_names.json`
 
-- `emmarex/plantdisease`
+Restart backend after training. If these files are missing, `/predict` returns `503`.
 
-## API Contract
+## API
 
-- `POST /predict`
-  - `multipart/form-data`
-  - field name: `file`
-  - accepts `image/jpeg` and `image/png`
-  - response:
-    - `disease` (string)
-    - `confidence` (0.0 to 1.0)
-    - `class_id` (int)
+- `GET /health`
+- `GET /model-info`
+- `POST /predict` (`multipart/form-data`, field: `file`)
 
 ## Safety
 
-The frontend includes explicit safety disclaimers:
+- AI output is assistive guidance only.
+- Always verify before treatment decisions.
 
-- AI output is assistive guidance only
-- users should verify before pesticide application
-- low-confidence outputs should be re-scanned and reviewed by an expert

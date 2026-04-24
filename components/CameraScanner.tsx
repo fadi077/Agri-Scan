@@ -80,8 +80,8 @@ export function CameraScanner({ onCapture, onPreviewReady, labels }: CameraScann
       setIsLoading(true);
       setScanError(null);
       await onCapture(blob);
-    } catch {
-      setScanError("Scan request failed. Check backend status and try again.");
+    } catch (err) {
+      setScanError(err instanceof Error ? err.message : "Scan request failed. Check backend status and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -98,8 +98,8 @@ export function CameraScanner({ onCapture, onPreviewReady, labels }: CameraScann
       setIsLoading(true);
       setScanError(null);
       await onCapture(file);
-    } catch {
-      setScanError("Upload scan failed. Check backend connection and retry.");
+    } catch (err) {
+      setScanError(err instanceof Error ? err.message : "Upload scan failed. Check backend connection and retry.");
     } finally {
       setIsLoading(false);
       event.target.value = "";
