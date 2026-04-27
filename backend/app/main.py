@@ -25,6 +25,8 @@ from app.config import (
     confidence_threshold,
     min_image_bytes,
     model_weight_path,
+    prediction_margin_threshold,
+    rejection_confidence_threshold,
     training_dataset_dir,
     user_uploads_dir,
 )
@@ -112,6 +114,8 @@ def model_info(request: Request) -> dict[str, Any]:
         "model_path": str(w_path),
         "class_count": bundle.class_count,
         "confidence_threshold": bundle.confidence_threshold,
+        "rejection_confidence_threshold": rejection_confidence_threshold(),
+        "prediction_margin_threshold": prediction_margin_threshold(),
         "uncertain_label": UNCERTAIN_LABEL,
         "supported_crops": ["tomato", "potato", "pepper", "any"],
         "class_names_path": str(c_path),
@@ -370,6 +374,36 @@ async def predict(
                 detail="This model has no class labels that match the selected crop. Choose “Any Crop” or retrain with labels that include that crop.",
             ) from e
         raise HTTPException(status_code=500, detail="Unexpected inference error.") from e
+
+    second_conf = out.top_predictions[1]["confidence"] if len(out.top_predictions) > 1 else 0.0
+    margin = out.confidence - float(second_conf)
+    if out.confidence < rejection_confidence_threshold() or margin < prediction_margin_threshold():
+        out_body = {
+            "disease": UNCERTAIN_LABEL,
+            "confidence": out.confidence,
+            "class_id": out.class_id,
+            "uncertain": True,
+            "rejected": True,
+            "rejection_reason": (
+                "Prediction is not reliable for supported crops. This image may belong to an unsupported crop "
+                "(for example banana/peach) or be outside the model's training scope."
+            ),
+            "top_predictions": out.top_predictions,
+            "selected_crop": crop,
+        }
+        out_body.update(
+            persist_scan_upload(
+                raw,
+                crop=crop,
+                disease=None,
+                class_id=out.class_id,
+                confidence=out.confidence,
+                rejected=True,
+                rejection_reason=out_body["rejection_reason"],
+                uncertain=True,
+            )
+        )
+        return out_body
 
     body: dict[str, Any] = {
         "disease": out.disease,

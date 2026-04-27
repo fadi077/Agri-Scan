@@ -33,6 +33,8 @@ export type ModelInfoResponse = {
   model_path: string;
   class_count: number;
   confidence_threshold: number;
+  rejection_confidence_threshold?: number;
+  prediction_margin_threshold?: number;
   uncertain_label: string;
   supported_crops?: string[];
   class_names_path?: string;

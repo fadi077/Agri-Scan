@@ -45,5 +45,6 @@ next-env.d.ts
 # ml/data artifacts
 /data/
 /artifacts/
+/artifacts_*/
 backend/__pycache__/
 backend/**/*.pyc
