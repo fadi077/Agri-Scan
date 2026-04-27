@@ -3,6 +3,7 @@
  * Free a TCP port on Windows by killing owning PIDs.
  * Safe no-op when port is already free.
  */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const { execSync } = require("child_process");
 
 const port = process.argv[2];
