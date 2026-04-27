@@ -46,5 +46,6 @@ next-env.d.ts
 /data/
 /artifacts/
 /artifacts_*/
+/.tools/
 backend/__pycache__/
 backend/**/*.pyc

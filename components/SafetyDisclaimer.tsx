@@ -21,6 +21,11 @@ export function SafetyDisclaimer({ compact = false }: SafetyDisclaimerProps) {
         Always verify treatment decisions locally before applying pesticides. Low-confidence
         results should be re-scanned in better lighting or checked by an expert.
       </p>
+      <p className="mt-2 font-semibold">
+        Liability disclaimer: this tool is provided as-is for informational support only. The
+        Agri Scan team is not liable for crop loss, treatment cost, or damages resulting from
+        misidentification, missed diagnosis, or actions taken based on AI output.
+      </p>
     </div>
   );
 }
